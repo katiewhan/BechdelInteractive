@@ -1,0 +1,4 @@
+ofxGui
+ofxHapPlayer
+ofxKinect
+ofxOpenCv
