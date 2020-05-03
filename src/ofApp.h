@@ -9,6 +9,7 @@
 class ofApp : public ofBaseApp{
 
 	public:
+		int numVideos;
 		vector<ofPtr<ofxHapPlayer>> videos;
 		vector<vector<ofPtr<ofxHapPlayer>>> missVideos;
 		vector<int> showMissVideo;

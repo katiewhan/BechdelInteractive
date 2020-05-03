@@ -4,7 +4,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	int numVideos = 4;
+	numVideos = 4;
 	for (int i = 0; i < numVideos; i++) {
 		ofPtr<ofxHapPlayer> p(new ofxHapPlayer());
 		p->load(ofToString(i) + ".mov");
@@ -67,15 +67,10 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < numVideos; i++) {
 		videos[i]->update();
 		missVideos[i][0]->update();
 		missVideos[i][1]->update();
-
-		//if (!missVideos[i]->isPlaying() && showMissVideo[i]) {
-			//showMissVideo[i] = false;
-			//videos[i]->setPosition(0);
-		//}
 	}
 
 	kinect.update();
@@ -111,31 +106,21 @@ void ofApp::update(){
 void ofApp::draw() {
 	ofSetBackgroundColor(0);
 
-	//int y = 800;
-
 	// blob detection
 	#ifndef DEBUG_MODE
-	vector<int> foundIndices;
+	bool found[numVideos] = { 0 };
 	for (int b = 0; b < contourFinder.blobs.size(); b++) {
-		//y += 15;
 		ofPoint centroid = contourFinder.blobs[b].centroid;
-		int index = floor(centroid.x / (kinect.width / 4));
-		foundIndices.push_back(index);
-		//showMissVideo[index] = true;
-		//if (!missVideos[index]->isPlaying()) {
-			//missVideos[index]->setPosition(videos[index]->getPosition());
-			//missVideos[index]->play();
-		//}
-		cout << ofToString(centroid) << " " << index << endl;
-		//ofDrawBitmapString(centroid, 10, y);
-		//ofDrawBitmapString(index, 200, y);
+		int index = floor(centroid.x / (kinect.width / numVideos));
+		found[index] = true;
+
+		//cout << ofToString(centroid) << " " << index << endl;
 	}
 	for (int j = 0; j < showMissVideo.size(); j++) {
-		vector<int>::iterator it = find(foundIndices.begin(), foundIndices.end(), j);
-		if (it != foundIndices.end() && showMissVideo[j] == 2) {
+		if (found[j] && showMissVideo[j] == 2) {
 			showMissVideo[j] = round(ofRandom(1));
 		}
-		else if (it == foundIndices.end()) {
+		else if (!found[j]) {
 			showMissVideo[j] = 2;
 		}
 	}
@@ -201,18 +186,16 @@ void ofApp::keyPressed(int key) {
 
 	#ifdef DEBUG_MODE
 	if (key > 47 && key < 52) {
-		vector<int> foundIndices;
-		foundIndices.push_back(key - 48);
+		bool found[numVideos] = { 0 };
+		found[key - 48] = true;
 		for (int j = 0; j < showMissVideo.size(); j++) {
-			vector<int>::iterator it = find(foundIndices.begin(), foundIndices.end(), j);
-			if (it != foundIndices.end() && showMissVideo[j] == 2) {
+			if (found[j] && showMissVideo[j] == 2) {
 				showMissVideo[j] = round(ofRandom(1));
 			}
-			else if (it == foundIndices.end()) {
+			else if (!found[j]) {
 				showMissVideo[j] = 2;
 			}
 		}
-		//showMissVideo[idx] = !showMissVideo[idx];
 	}
 	#endif
 }
